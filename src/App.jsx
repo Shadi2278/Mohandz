@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { Helmet } from 'react-helmet';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Toaster } from '@/components/ui/toaster';
-import { AuthProvider, useAuth } from '@/contexts/AuthContext';
+import { AuthProvider, useAuth } from '@/contexts/Auth';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 
 // Components
@@ -22,6 +22,7 @@ import ContactPage from '@/pages/ContactPage';
 import LoginPage from '@/pages/LoginPage';
 import RegisterPage from '@/pages/RegisterPage';
 import ForgotPasswordPage from '@/pages/ForgotPasswordPage';
+import UpdatePasswordPage from '@/pages/UpdatePasswordPage';
 
 // Admin Pages
 import AdminLayout from '@/pages/admin/AdminLayout';
@@ -40,18 +41,41 @@ import ClientDashboard from '@/pages/client/ClientDashboard';
 import ClientProjects from '@/pages/client/ClientProjects';
 import ClientProfile from '@/pages/client/ClientProfile';
 import ClientRequestService from '@/pages/client/ClientRequestService';
+import { useToast } from './components/ui/use-toast';
 
 const AdminProtectedRoute = ({ children }) => {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
+  const { toast } = useToast();
+  
+  if (loading) {
+    return <div className="min-h-screen flex items-center justify-center bg-background text-white">جارِ التحميل...</div>;
+  }
+
   if (!user || user.role !== 'admin') {
+     toast({
+      title: "غير مصرح",
+      description: "يجب أن تكون مسؤولاً للوصول لهذه الصفحة.",
+      variant: "destructive",
+    });
     return <Navigate to="/login" replace />;
   }
   return children;
 };
 
 const ClientProtectedRoute = ({ children }) => {
-  const { user } = useAuth();
-  if (!user || user.role !== 'client') {
+  const { user, loading } = useAuth();
+  const { toast } = useToast();
+
+  if (loading) {
+    return <div className="min-h-screen flex items-center justify-center bg-background text-white">جارِ التحميل...</div>;
+  }
+
+  if (!user) {
+    toast({
+      title: "مطلوب تسجيل الدخول",
+      description: "الرجاء تسجيل الدخول للوصول لهذه الصفحة.",
+      variant: "destructive",
+    });
     return <Navigate to="/login" replace />;
   }
   return children;
@@ -59,6 +83,7 @@ const ClientProtectedRoute = ({ children }) => {
 
 const AppContent = () => {
   const [showSplash, setShowSplash] = useState(true);
+  const { loading: authLoading } = useAuth();
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -67,6 +92,10 @@ const AppContent = () => {
 
     return () => clearTimeout(timer);
   }, []);
+
+  if (authLoading && !showSplash) {
+      return <SplashScreen key="auth-loading" onComplete={() => {}} />;
+  }
 
   return (
     <>
@@ -94,6 +123,7 @@ const AppContent = () => {
                   <Route path="/login" element={<LoginPage />} />
                   <Route path="/register" element={<RegisterPage />} />
                   <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+                  <Route path="/update-password" element={<UpdatePasswordPage />} />
                   
                   <Route path="/admin" element={<AdminProtectedRoute><AdminLayout /></AdminProtectedRoute>}>
                     <Route index element={<AdminDashboard />} />

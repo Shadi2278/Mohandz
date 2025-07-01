@@ -5,6 +5,7 @@ import { Helmet } from 'react-helmet';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/components/ui/use-toast';
+import { supabase } from '@/lib/customSupabaseClient';
 import { Mail, KeyRound } from 'lucide-react';
 
 const ForgotPasswordPage = () => {
@@ -12,17 +13,28 @@ const ForgotPasswordPage = () => {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
-    setTimeout(() => {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/update-password`,
+    });
+
+    setLoading(false);
+
+    if (error) {
       toast({
-        title: "🚧 هذه الميزة غير متاحة حالياً",
-        description: "لا تقلق! يمكنك طلبها في رسالتك التالية! 🚀",
+        variant: "destructive",
+        title: "❌ خطأ في إرسال الرابط",
+        description: "حدث خطأ ما. يرجى التحقق من البريد الإلكتروني والمحاولة مرة أخرى.",
       });
-      setLoading(false);
-    }, 1000);
+    } else {
+      toast({
+        title: "✅ تم إرسال الرابط بنجاح",
+        description: "لقد أرسلنا رابطاً إلى بريدك الإلكتروني لإعادة تعيين كلمة المرور.",
+      });
+    }
   };
 
   return (

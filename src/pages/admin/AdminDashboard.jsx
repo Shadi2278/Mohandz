@@ -2,38 +2,73 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Briefcase, FolderKanban, Users, MessageSquare } from 'lucide-react';
+import { supabase } from '@/lib/customSupabaseClient';
 
 const AdminDashboard = () => {
   const [stats, setStats] = useState({
     users: 0,
     requests: 0,
     projects: 0,
-    services: 0
+    services: 7 
   });
+  const [recentRequests, setRecentRequests] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // In a real app, you'd fetch this data. Here we use localStorage.
-    const users = JSON.parse(localStorage.getItem('users')) || [];
-    const requests = JSON.parse(localStorage.getItem('serviceRequests')) || [];
-    const projects = JSON.parse(localStorage.getItem('projects')) || [];
-    const services = JSON.parse(localStorage.getItem('services')) || [];
+    const fetchStats = async () => {
+      try {
+        const { count: usersCount, error: usersError } = await supabase.from('profiles').select('*', { count: 'exact', head: true });
+        const { count: contactMessagesCount, error: contactError } = await supabase.from('contact_messages').select('*', { count: 'exact', head: true });
+        const { count: serviceRequestsCount, error: serviceReqError } = await supabase.from('service_requests').select('*', { count: 'exact', head: true });
 
-    setStats({
-      users: users.length,
-      requests: requests.length,
-      projects: projects.length,
-      services: services.length,
-    });
+        if (usersError) console.error('Users Error:', usersError);
+        if (contactError) console.error('Contact Error:', contactError);
+        if (serviceReqError) console.error('Service Request Error:', serviceReqError);
+        
+        setStats(prev => ({
+          ...prev,
+          users: usersCount || 0,
+          requests: (contactMessagesCount || 0) + (serviceRequestsCount || 0),
+        }));
+      } catch (error) {
+        console.error('Error fetching stats:', error);
+      }
+    };
+    
+    const fetchRecentRequests = async () => {
+        try {
+            const { data, error } = await supabase
+                .from('service_requests')
+                .select('*')
+                .order('created_at', { ascending: false })
+                .limit(5);
+
+            if (error) throw error;
+            setRecentRequests(data);
+        } catch (error) {
+            console.error('Error fetching recent requests:', error);
+        }
+    };
+
+    const loadData = async () => {
+        setLoading(true);
+        await Promise.all([fetchStats(), fetchRecentRequests()]);
+        setLoading(false);
+    }
+    
+    loadData();
   }, []);
 
   const statCards = [
     { title: 'إجمالي المستخدمين', value: stats.users, icon: Users, color: 'text-purple-400' },
     { title: 'إجمالي الطلبات', value: stats.requests, icon: MessageSquare, color: 'text-blue-400' },
     { title: 'إجمالي المشاريع', value: stats.projects, icon: FolderKanban, color: 'text-green-400' },
-    { title: 'إجمالي الخدمات', value: stats.services, icon: Briefcase, color: 'text-yellow-400' },
+    { title: 'إجمالي أقسام الخدمات', value: stats.services, icon: Briefcase, color: 'text-yellow-400' },
   ];
 
-  const recentRequests = (JSON.parse(localStorage.getItem('serviceRequests')) || []).slice(-5).reverse();
+  if (loading) {
+    return <div className="text-center text-white">جارِ تحميل البيانات...</div>
+  }
 
   return (
     <div className="space-y-8">
@@ -74,7 +109,7 @@ const AdminDashboard = () => {
       >
         <Card className="bg-[#282C34] border-gray-700 text-white">
           <CardHeader>
-            <CardTitle>أحدث الطلبات</CardTitle>
+            <CardTitle>أحدث طلبات الخدمات</CardTitle>
           </CardHeader>
           <CardContent>
             {recentRequests.length > 0 ? (
@@ -82,34 +117,19 @@ const AdminDashboard = () => {
                 {recentRequests.map(req => (
                   <li key={req.id} className="flex items-center justify-between p-3 bg-[#3C4043] rounded-lg">
                     <div>
-                      <p className="font-semibold">{req.serviceTitle}</p>
+                      <p className="font-semibold">{req.service_title || "طلب خدمة عام"}</p>
                       <p className="text-sm text-gray-400">{req.fullName} - {req.email}</p>
                     </div>
-                    <span className="text-xs text-gray-500">{new Date(req.createdAt).toLocaleDateString('ar-SA')}</span>
+                    <span className="text-xs text-gray-500">{new Date(req.created_at).toLocaleDateString('ar-SA')}</span>
                   </li>
                 ))}
               </ul>
             ) : (
-              <p className="text-gray-400 text-center py-4">لا توجد طلبات حديثة.</p>
+              <p className="text-gray-400 text-center py-4">لا توجد طلبات خدمات حديثة.</p>
             )}
           </CardContent>
         </Card>
       </motion.div>
-      
-      <div className="pt-6">
-        <h2 className="text-xl font-semibold text-white mb-4">تنبيه هام</h2>
-        <div className="bg-yellow-900/30 border border-yellow-500 text-yellow-300 p-4 rounded-lg">
-            <p>
-                أنت تستخدم حاليًا <strong>`localStorage`</strong> لتخزين البيانات. هذا مناسب للتجربة الأولية، لكنه غير آمن وغير دائم للاستخدام الفعلي.
-            </p>
-            <p className="mt-2">
-                للحصول على تجربة متكاملة وآمنة، <strong>أوصي بشدة بالانتقال إلى Supabase</strong>. سيمكنك ذلك من تخزين البيانات بشكل آمن، وإدارة الملفات، وتأمين المصادقة بشكل احترافي.
-            </p>
-            <p className="mt-2">
-                هل أنت جاهز لنقل منصتك إلى المستوى التالي باستخدام Supabase؟ 🚀
-            </p>
-        </div>
-    </div>
     </div>
   );
 };

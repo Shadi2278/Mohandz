@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Helmet } from 'react-helmet';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import ServiceRequestModal from '@/components/ServiceRequestModal';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useAuth } from '@/contexts/Auth';
+import ServiceRequestModal from '@/components/ServiceRequestModal';
 import { 
     Building2, Route as RoadIcon, Map as MapIcon, FileSignature, Edit3, DraftingCompass, HardHat, CircuitBoard, 
     Waypoints, Fuel, TrafficCone, Waves, Router as Bridge, Footprints, Landmark, Ruler, Paintbrush, 
@@ -118,10 +119,12 @@ const translations = {
 
 const ServicesPage = () => {
     const { t } = useLanguage();
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [selectedService, setSelectedService] = useState(null);
+    const { user } = useAuth();
+    const navigate = useNavigate();
     const location = useLocation();
     const serviceRefs = useRef({});
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedService, setSelectedService] = useState('');
 
     useEffect(() => {
         if (location.state?.scrollTo) {
@@ -132,9 +135,13 @@ const ServicesPage = () => {
         }
     }, [location.state]);
 
-    const handleServiceRequestClick = (service) => {
-        setSelectedService(service);
-        setIsModalOpen(true);
+    const handleServiceRequestClick = (serviceTitle) => {
+        if (!user) {
+            navigate('/login');
+        } else {
+            setSelectedService(serviceTitle);
+            setIsModalOpen(true);
+        }
     };
 
     return (
@@ -144,10 +151,10 @@ const ServicesPage = () => {
                 <meta name="description" content={t(translations.helmet.description)} />
             </Helmet>
 
-            <ServiceRequestModal
-                isOpen={isModalOpen}
-                setIsOpen={setIsModalOpen}
-                serviceTitle={selectedService ? t(selectedService.title) : ''}
+            <ServiceRequestModal 
+                isOpen={isModalOpen} 
+                setIsOpen={setIsModalOpen} 
+                serviceTitle={selectedService} 
             />
 
             <div className="min-h-screen py-20 bg-background">
@@ -199,7 +206,7 @@ const ServicesPage = () => {
                                             <h3 className="text-xl font-bold text-foreground mb-2">{t(service.title)}</h3>
                                             <p className="text-muted-foreground text-sm mb-4 flex-grow">{t(service.description)}</p>
                                             <Button
-                                                onClick={() => handleServiceRequestClick(service)}
+                                                onClick={() => handleServiceRequestClick(t(service.title))}
                                                 className="w-full brand-gradient text-primary-foreground hover:scale-105 transition-all duration-300 mt-auto"
                                             >
                                                 <Plus className="w-4 h-4 ml-2" />

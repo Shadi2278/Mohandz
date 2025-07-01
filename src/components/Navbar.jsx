@@ -1,10 +1,11 @@
+
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
 import { Menu, X, User, LogIn, LogOut, LayoutDashboard, UserCog, Search } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts/Auth';
 import { useLanguage } from '@/contexts/LanguageContext';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 
@@ -51,8 +52,8 @@ const Navbar = () => {
     });
   };
   
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     toast({
       title: t(translations.logoutSuccessTitle),
       description: t(translations.logoutSuccessDesc),
