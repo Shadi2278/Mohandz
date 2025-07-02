@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Helmet } from 'react-helmet';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useAuth } from '@/contexts/Auth';
 import ServiceRequestModal from '@/components/ServiceRequestModal';
 import { 
     Building2, Route as RoadIcon, Map as MapIcon, FileSignature, Edit3, DraftingCompass, HardHat, CircuitBoard, 
@@ -119,8 +118,6 @@ const translations = {
 
 const ServicesPage = () => {
     const { t } = useLanguage();
-    const { user } = useAuth();
-    const navigate = useNavigate();
     const location = useLocation();
     const serviceRefs = useRef({});
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -136,12 +133,8 @@ const ServicesPage = () => {
     }, [location.state]);
 
     const handleServiceRequestClick = (serviceTitle) => {
-        if (!user) {
-            navigate('/login');
-        } else {
-            setSelectedService(serviceTitle);
-            setIsModalOpen(true);
-        }
+        setSelectedService(serviceTitle);
+        setIsModalOpen(true);
     };
 
     return (

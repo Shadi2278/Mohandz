@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useEffect, useState, useCallback, useMemo } from 'react';
 import { supabase } from '@/lib/customSupabaseClient';
 
@@ -8,26 +7,37 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchUserProfile = async (authUser) => {
+  const fetchUserProfile = useCallback(async (authUser) => {
     if (!authUser) {
       setUser(null);
       setLoading(false);
       return;
     }
 
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role, full_name, phone')
-      .eq('id', authUser.id)
-      .single();
+    try {
+      setLoading(true);
+      const { data: profile, error } = await supabase
+        .from('profiles')
+        .select('role, full_name, phone')
+        .eq('id', authUser.id)
+        .single();
 
-    const userData = {
-      ...authUser,
-      ...profile,
-    };
-    setUser(userData);
-    setLoading(false);
-  };
+      if (error && error.code !== 'PGRST116') { // PGRST116 means no rows found, which is okay for a moment
+        throw error;
+      }
+
+      const userData = {
+        ...authUser,
+        ...profile,
+      };
+      setUser(userData);
+    } catch (error) {
+      console.error("Error fetching user profile:", error);
+      setUser(authUser); // Fallback to auth user data
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     const getSession = async () => {
@@ -46,7 +56,7 @@ export const AuthProvider = ({ children }) => {
     return () => {
       authListener.subscription.unsubscribe();
     };
-  }, []);
+  }, [fetchUserProfile]);
 
   const login = useCallback(async (email, password) => {
     const response = await supabase.auth.signInWithPassword({ email, password });
@@ -79,7 +89,8 @@ export const AuthProvider = ({ children }) => {
     login,
     register,
     logout,
-  }), [user, loading, login, register, logout]);
+    fetchUserProfile,
+  }), [user, loading, login, register, logout, fetchUserProfile]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

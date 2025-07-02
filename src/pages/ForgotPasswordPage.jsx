@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -6,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/lib/customSupabaseClient';
-import { Mail, KeyRound } from 'lucide-react';
+import { Mail, KeyRound, Loader2 } from 'lucide-react';
 
 const ForgotPasswordPage = () => {
   const { toast } = useToast();
@@ -47,11 +48,11 @@ const ForgotPasswordPage = () => {
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="max-w-md w-full space-y-8 bg-[#282C34]/80 backdrop-blur-sm p-10 rounded-2xl shadow-2xl border border-gray-700"
+          className="max-w-md w-full space-y-8 bg-card/80 backdrop-blur-sm p-10 rounded-2xl shadow-2xl border border-border"
         >
           <div>
-            <h1 className="text-center text-3xl font-bold text-white">استعادة كلمة المرور</h1>
-            <p className="mt-2 text-center text-sm text-gray-400">
+            <h1 className="text-center text-3xl font-bold text-card-foreground">استعادة كلمة المرور</h1>
+            <p className="mt-2 text-center text-sm text-muted-foreground">
               أدخل بريدك الإلكتروني وسنرسل لك رابطاً لإعادة تعيين كلمة المرور.
             </p>
           </div>
@@ -61,7 +62,7 @@ const ForgotPasswordPage = () => {
                 <label htmlFor="email-address" className="sr-only">البريد الإلكتروني</label>
                 <div className="relative">
                   <span className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                    <Mail className="h-5 w-5 text-gray-400" />
+                    <Mail className="h-5 w-5 text-muted-foreground" />
                   </span>
                   <Input
                     id="email-address"
@@ -79,8 +80,8 @@ const ForgotPasswordPage = () => {
             </div>
 
             <div>
-              <Button type="submit" disabled={loading} className="w-full purple-gradient hover:scale-105 transition-all duration-300 py-3 text-lg font-semibold">
-                {loading ? 'جارِ الإرسال...' : (
+              <Button type="submit" disabled={loading || !email} className="w-full brand-gradient text-primary-foreground hover:scale-105 transition-all duration-300 py-3 text-lg font-semibold">
+                {loading ? <><Loader2 className="w-5 h-5 ml-2 animate-spin" /> جارِ الإرسال...</> : (
                   <>
                     <KeyRound className="w-5 h-5 ml-2" />
                     إرسال رابط الاستعادة
@@ -90,7 +91,7 @@ const ForgotPasswordPage = () => {
             </div>
           </form>
           <div className="text-sm text-center">
-            <Link to="/login" className="font-medium text-purple-400 hover:text-purple-300">
+            <Link to="/login" className="font-medium text-primary hover:text-primary/80">
               العودة إلى صفحة تسجيل الدخول
             </Link>
           </div>

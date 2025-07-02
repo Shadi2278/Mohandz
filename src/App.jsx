@@ -1,17 +1,15 @@
-import React, { useState, useEffect } from 'react';
+
+import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Toaster } from '@/components/ui/toaster';
 import { AuthProvider, useAuth } from '@/contexts/Auth';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 
-// Components
-import SplashScreen from '@/components/SplashScreen';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 
-// Pages
 import HomePage from '@/pages/HomePage';
 import ServicesPage from '@/pages/ServicesPage';
 import ProjectsPage from '@/pages/ProjectsPage';
@@ -24,7 +22,6 @@ import RegisterPage from '@/pages/RegisterPage';
 import ForgotPasswordPage from '@/pages/ForgotPasswordPage';
 import UpdatePasswordPage from '@/pages/UpdatePasswordPage';
 
-// Admin Pages
 import AdminLayout from '@/pages/admin/AdminLayout';
 import AdminDashboard from '@/pages/admin/AdminDashboard';
 import AdminServices from '@/pages/admin/AdminServices';
@@ -35,7 +32,6 @@ import AdminRequests from '@/pages/admin/AdminRequests';
 import AdminUsers from '@/pages/admin/AdminUsers';
 import SystemSettings from '@/pages/admin/SystemSettings';
 
-// Client Pages
 import ClientLayout from '@/pages/client/ClientLayout';
 import ClientDashboard from '@/pages/client/ClientDashboard';
 import ClientProjects from '@/pages/client/ClientProjects';
@@ -48,7 +44,20 @@ const AdminProtectedRoute = ({ children }) => {
   const { toast } = useToast();
   
   if (loading) {
-    return <div className="min-h-screen flex items-center justify-center bg-background text-white">جارِ التحميل...</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background text-white">
+        <div className="flex justify-center items-center space-x-2 space-x-reverse">
+            {[0, 1, 2].map((i) => (
+              <motion.div
+                key={i}
+                animate={{ scale: [1, 1.2, 1], opacity: [0.5, 1, 0.5] }}
+                transition={{ duration: 1.2, repeat: Infinity, delay: i * 0.2 }}
+                className="w-3 h-3 bg-accent rounded-full"
+              />
+            ))}
+          </div>
+      </div>
+    );
   }
 
   if (!user || user.role !== 'admin') {
@@ -67,7 +76,20 @@ const ClientProtectedRoute = ({ children }) => {
   const { toast } = useToast();
 
   if (loading) {
-    return <div className="min-h-screen flex items-center justify-center bg-background text-white">جارِ التحميل...</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background text-white">
+        <div className="flex justify-center items-center space-x-2 space-x-reverse">
+            {[0, 1, 2].map((i) => (
+              <motion.div
+                key={i}
+                animate={{ scale: [1, 1.2, 1], opacity: [0.5, 1, 0.5] }}
+                transition={{ duration: 1.2, repeat: Infinity, delay: i * 0.2 }}
+                className="w-3 h-3 bg-accent rounded-full"
+              />
+            ))}
+          </div>
+      </div>
+    );
   }
 
   if (!user) {
@@ -81,34 +103,16 @@ const ClientProtectedRoute = ({ children }) => {
   return children;
 }
 
-const AppContent = () => {
-  const [showSplash, setShowSplash] = useState(true);
-  const { loading: authLoading } = useAuth();
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowSplash(false);
-    }, 4000);
-
-    return () => clearTimeout(timer);
-  }, []);
-
-  if (authLoading && !showSplash) {
-      return <SplashScreen key="auth-loading" onComplete={() => {}} />;
-  }
-
+function App() {
   return (
-    <>
-      <Helmet>
-        <title>منصة مهندز - منصتك المتكاملة للخدمات الهندسية</title>
-        <meta name="description" content="منصة مهندز هي منصتك المتكاملة للخدمات الهندسية المتخصصة في المملكة العربية السعودية. نصمم لك المستقبل بدقة وإبداع." />
-      </Helmet>
-      
-      <AnimatePresence mode="wait">
-        {showSplash ? (
-          <SplashScreen key="splash" onComplete={() => setShowSplash(false)} />
-        ) : (
-          <Router key="main">
+    <LanguageProvider>
+      <AuthProvider>
+        <Helmet>
+          <title>منصة مهندز - منصتك المتكاملة للخدمات الهندسية</title>
+          <meta name="description" content="منصة مهندز هي منصتك المتكاملة للخدمات الهندسية المتخصصة في المملكة العربية السعودية. نصمم لك المستقبل بدقة وإبداع." />
+        </Helmet>
+        
+        <Router>
             <div className="min-h-screen bg-background flex flex-col">
               <Navbar />
               <main className="flex-grow">
@@ -147,20 +151,8 @@ const AppContent = () => {
               </main>
               <Footer />
             </div>
-          </Router>
-        )}
-      </AnimatePresence>
-      
-      <Toaster />
-    </>
-  );
-};
-
-function App() {
-  return (
-    <LanguageProvider>
-      <AuthProvider>
-        <AppContent />
+        </Router>
+        <Toaster />
       </AuthProvider>
     </LanguageProvider>
   );

@@ -101,11 +101,10 @@ const HomePage = () => {
       </Helmet>
 
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-        <img  
-          alt="خلفية هندسية احترافية لمشاريع بنية تحتية وطرق"
-          className="absolute z-0 w-full h-full object-cover"
-         src="https://images.unsplash.com/photo-1511695622093-c9c94b8674a5" />
-        <div className="absolute inset-0 bg-primary/70 z-10"></div>
+        <img 
+          alt="خلفية هندسية حديثة مع عناصر خضراء مستدامة"
+          className="absolute z-0 w-full h-full object-cover" src="https://images.unsplash.com/photo-1558052643-9a9e9ea8e50a" />
+        <div className="absolute inset-0 bg-[hsl(var(--brand-green))]/80 z-10"></div>
         
         <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.div

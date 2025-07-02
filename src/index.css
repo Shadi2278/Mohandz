@@ -17,35 +17,59 @@ body {
 
 @layer base {
   :root {
-    --background: 210 20% 98%; /* #f8f9fa */
-    --foreground: 192 75% 15%; /* #083b46 */
+    --background: 222 47% 11%; /* #111827 - Dark Blue */
+    --foreground: 210 40% 96%; /* #f1f5f9 - Light Gray */
     
-    --card: 0 0% 100%; /* #ffffff */
-    --card-foreground: 192 75% 15%; /* #083b46 */
+    --card: 222 47% 16%; /* #1f2937 - Darker Blue/Gray */
+    --card-foreground: 210 40% 98%; /* #f8fafc */
     
-    --popover: 0 0% 100%;
-    --popover-foreground: 192 75% 15%;
+    --popover: 224 71% 4%; /* #030712 - Almost Black */
+    --popover-foreground: 210 40% 98%;
     
-    --primary: 192 75% 29%; /* #126e82 - Dark Teal */
-    --primary-foreground: 210 20% 98%;
+    --primary: 262 84% 59%; /* #8b5cf6 - Vibrant Purple */
+    --primary-foreground: 210 40% 98%;
     
-    --secondary: 167 34% 66%; /* #89c9b8 - Light Teal */
-    --secondary-foreground: 192 75% 15%;
+    --secondary: 217 91% 60%; /* #3b82f6 - Vibrant Blue */
+    --secondary-foreground: 210 40% 98%;
     
-    --muted: 210 16% 93%; /* #e9ecef */
-    --muted-foreground: 192 75% 29%;
+    --muted: 222 47% 25%; /* #374151 - Muted Gray/Blue */
+    --muted-foreground: 210 40% 80%; /* #cbd5e1 */
     
-    --accent: 11 56% 67%; /* #d88a7b - Peach */
-    --accent-foreground: 192 75% 15%;
+    --accent: 325 91% 60%; /* #f472b6 - Vibrant Pink */
+    --accent-foreground: 210 40% 98%;
     
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 210 20% 98%;
+    --destructive: 0 72% 51%; /* #ef4444 - Red */
+    --destructive-foreground: 210 40% 98%;
     
-    --border: 210 14% 89%; /* #dee2e6 */
-    --input: 210 16% 93%; /* #e9ecef */
-    --ring: 167 34% 66%; /* Light Teal for focus */
+    --border: 222 47% 25%; /* #374151 */
+    --input: 222 47% 14%; /* #1a202e */
+    --ring: 217 91% 60%; /* Vibrant Blue for focus */
 
     --radius: 0.75rem;
+    --brand-green: 145 63% 42%; /* A modern, deep green */
+  }
+
+  .dark {
+    --background: 222 47% 11%;
+    --foreground: 210 40% 96%;
+    --card: 222 47% 16%;
+    --card-foreground: 210 40% 98%;
+    --popover: 224 71% 4%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 262 84% 59%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 217 91% 60%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 222 47% 25%;
+    --muted-foreground: 210 40% 80%;
+    --accent: 325 91% 60%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 222 47% 25%;
+    --input: 222 47% 14%;
+    --ring: 217 91% 60%;
+    --brand-green: 145 63% 42%;
   }
 }
 
@@ -70,7 +94,7 @@ body {
 
 .card-hover:hover {
   transform: translateY(-5px);
-  box-shadow: 0 10px 25px -5px hsla(var(--primary), 0.1), 0 8px 10px -6px hsla(var(--primary), 0.1);
+  box-shadow: 0 10px 25px -5px hsla(var(--primary), 0.2), 0 8px 10px -6px hsla(var(--primary), 0.2);
   border-color: hsl(var(--secondary));
 }
 
@@ -79,9 +103,10 @@ body {
 }
 
 .hero-pattern {
+  background-color: hsl(var(--background));
   background-image: 
-    radial-gradient(circle at 15% 25%, hsla(var(--accent), 0.2) 0%, transparent 40%),
-    radial-gradient(circle at 85% 75%, hsla(var(--secondary), 0.2) 0%, transparent 40%);
+    radial-gradient(circle at 15% 25%, hsla(var(--primary), 0.1) 0%, transparent 40%),
+    radial-gradient(circle at 85% 75%, hsla(var(--secondary), 0.1) 0%, transparent 40%);
 }
 
 .service-icon {
